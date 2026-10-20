@@ -1,0 +1,13 @@
+# Power BI temp / autosave
+~$*
+*.pbix~
+.pbi/
+*.tmp
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Python (helper scripts, if added)
+__pycache__/
+.venv/

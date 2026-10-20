@@ -1,0 +1,16 @@
+{
+  "name": "BeanStream",
+  "dataColors": [
+    "#6F4E37",
+    "#C8A27A",
+    "#3E5C4B",
+    "#D9C5A0",
+    "#8C3B3B",
+    "#4A6FA5",
+    "#A98467",
+    "#7F8C8D"
+  ],
+  "background": "#FFFFFF",
+  "foreground": "#1F1F1F",
+  "tableAccent": "#6F4E37"
+}

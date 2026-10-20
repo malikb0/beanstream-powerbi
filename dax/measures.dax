@@ -1,0 +1,86 @@
+Total Revenue =
+CALCULATE (
+    SUM ( fact_sales[line_amount] ),
+    fact_sales[order_status] <> "cancelled"
+)
+
+Orders =
+CALCULATE (
+    DISTINCTCOUNT ( fact_sales[order_id] ),
+    fact_sales[order_status] <> "cancelled"
+)
+
+Units Sold =
+CALCULATE (
+    SUM ( fact_sales[quantity] ),
+    fact_sales[order_status] <> "cancelled"
+)
+
+AOV =
+DIVIDE ( [Total Revenue], [Orders] )
+
+Active Customers =
+CALCULATE (
+    DISTINCTCOUNT ( fact_sales[customer_id] ),
+    fact_sales[order_status] <> "cancelled"
+)
+
+Revenue per Customer =
+DIVIDE ( [Total Revenue], [Active Customers] )
+
+Avg Selling Price =
+DIVIDE ( [Total Revenue], [Units Sold] )
+
+Revenue PM =
+CALCULATE (
+    [Total Revenue],
+    DATEADD ( dim_date[MonthStart], -1, MONTH )
+)
+
+MoM % =
+DIVIDE ( [Total Revenue] - [Revenue PM], [Revenue PM] )
+
+Latest Month MoM % =
+VAR LastMonth =
+    MAX ( dim_date[MonthStart] )
+RETURN
+    CALCULATE ( [MoM %], dim_date[MonthStart] = LastMonth )
+
+Revenue PY =
+CALCULATE (
+    [Total Revenue],
+    SAMEPERIODLASTYEAR ( dim_date[MonthStart] )
+)
+
+YoY % =
+DIVIDE ( [Total Revenue] - [Revenue PY], [Revenue PY] )
+
+Revenue Running Total =
+CALCULATE (
+    [Total Revenue],
+    FILTER (
+        ALLSELECTED ( dim_date[MonthStart] ),
+        dim_date[MonthStart] <= MAX ( dim_date[MonthStart] )
+    )
+)
+
+Cancelled Order % =
+DIVIDE (
+    CALCULATE (
+        DISTINCTCOUNT ( fact_sales[order_id] ),
+        fact_sales[order_status] = "cancelled"
+    ),
+    DISTINCTCOUNT ( fact_sales[order_id] )
+)
+
+Revenue % of Total =
+DIVIDE ( [Total Revenue], CALCULATE ( [Total Revenue], ALLSELECTED () ) )
+
+Product Rank =
+RANKX (
+    ALLSELECTED ( dim_product[product_name] ),
+    [Total Revenue],
+    ,
+    DESC,
+    Dense
+)
