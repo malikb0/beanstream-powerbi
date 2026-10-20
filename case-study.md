@@ -1,15 +1,27 @@
 # Case study — Power BI KPI dashboard for BeanStream
 
-**Role:** Data / BI · **Tools:** Power BI Desktop, Power Query, DAX, PostgreSQL ·
-**Status:** Built 2026-10-20
+BeanStream is a fictional coffee-subscription retailer. The data platform already existed; this project
+adds the missing BI layer — a three-page Power BI report over the warehouse, with 16 DAX measures and an
+exact reconciliation to the source KPIs.
 
 ![Executive dashboard](screenshots/01-executive.png)
 
+## At a glance
+
+| Field | Detail |
+|---|---|
+| **Role** | Data / BI |
+| **Tools** | Power BI Desktop · Power Query · DAX · PostgreSQL |
+| **Data** | Synthetic BeanStream warehouse (2024, seed 42) |
+| **Scope** | 3 pages · 16 measures · 5 tables |
+| **Status** | Built 2026-10-20 |
+| **Result** | Reconciles exactly to the source KPI summary |
+
 ## Context
 
-BeanStream is a fictional coffee-subscription retailer. I had already built its end-to-end data
-platform — synthetic CSVs → MySQL OLTP → star-schema PostgreSQL warehouse → incremental, watermarked
-ETL, with 24 tests. The platform shipped SQL reports and a KPI summary, but no interactive BI layer.
+I had already built BeanStream's end-to-end data platform: synthetic CSVs → MySQL OLTP →
+star-schema PostgreSQL warehouse → incremental, watermarked ETL, with 24 tests. The platform shipped SQL
+reports and a KPI summary, but no interactive BI layer.
 
 ## Problem
 
@@ -27,6 +39,17 @@ the local data market).
   Top-N ranking.
 - Built three pages: Executive, Trends, Products & Customers.
 
+## Technical highlights
+
+- Import-mode star schema: one fact, four dimensions, four single-direction relationships.
+- `MonthStart` date column for reliable `DATEADD`-based MoM; a latest-month measure for the KPI card.
+- 16 measures across **Core**, **Time**, **Quality**, and **Share** — see the
+  [measure catalogue](docs/measures.md).
+- Cancelled orders excluded in measures, visible as a 17.5% quality KPI.
+- Accessibility: alt text, tab order, no 3D, page-only screenshots.
+- Documentation covers architecture, grain, DAX, validation, and the rebuild path — see the
+  [documentation hub](docs/README.md).
+
 ## Decisions
 
 - **Cancelled orders stay in the fact table** and are excluded in measures, so cancellation remains
@@ -43,17 +66,38 @@ the local data market).
 The report reconciles exactly to the platform's KPI summary:
 
 | KPI | Value |
-|-----|------:|
+|---|---:|
 | Revenue (non-cancelled) | 7,261.50 |
 | Orders | 99 |
 | Units | 448 |
 | AOV | 73.35 |
-| Customers | 40 |
+| Active customers | 39 |
+| Customer dimension rows | 40 |
 | Products | 12 |
+| Cancellation rate | 17.5% |
+| Latest month MoM | +190.03% |
 
-Revenue peaks in October at $1,273.00; the lowest month is March ($252.75), with a sharp November
-drop to $286.00. Coffee is the largest category and the app channel contributes about half of
-revenue; AOV is $73.35 across 99 orders.
+Revenue peaks in October at $1,273.00; the lowest month is March ($252.75), with a sharp November drop
+to $286.00. Coffee is the largest category and the app channel contributes about half of revenue; AOV is
+$73.35 across 99 orders.
+
+## The report
+
+| Executive | Trends | Products & Customers |
+|---|---|---|
+| <a href="screenshots/01-executive.png"><img src="screenshots/01-executive.png" width="260" alt="Executive page"></a> | <a href="screenshots/02-trends.png"><img src="screenshots/02-trends.png" width="260" alt="Trends page"></a> | <a href="screenshots/03-products.png"><img src="screenshots/03-products.png" width="260" alt="Products and Customers page"></a> |
+
+The Executive page answers *how much and where*; Trends answers *how it is moving*; Products &
+Customers answers *what drives revenue*. Click any page for the full-size PNG.
+
+## Evidence
+
+| What | Where |
+|---|---|
+| KPI reconciliation | [README validation table](README.md) and [build guide §12](docs/spec.md#12-reconcile) |
+| Measure definitions | [`dax/measures.dax`](dax/measures.dax) and [measure catalogue](docs/measures.md) |
+| Model design | [Data model](docs/data-model.md) and [architecture](docs/architecture.md) |
+| Rebuild path | [Build guide](docs/spec.md) |
 
 ## What I'd do next
 
@@ -63,3 +107,5 @@ Incremental refresh, row-level security by country, and a published report with 
 
 - Repo: [github.com/malikb0/beanstream-powerbi](https://github.com/malikb0/beanstream-powerbi)
 - Platform: [ecommerce-data-platform-practice-project](https://github.com/malikb0/ecommerce-data-platform-practice-project)
+- Screenshots: [Executive](screenshots/01-executive.png) · [Trends](screenshots/02-trends.png) ·
+  [Products & Customers](screenshots/03-products.png)

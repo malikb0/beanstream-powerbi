@@ -6,7 +6,49 @@ step ends with a **check**.
 The finished report is [`../powerbi/beanstream-kpi.pbix`](../powerbi/beanstream-kpi.pbix); the page
 exports are in [`../screenshots/`](../screenshots/).
 
-**Time:** 2–3 hours.
+Architecture and design decisions: [architecture.md](architecture.md); data model:
+[data-model.md](data-model.md); measure catalogue: [measures.md](measures.md).
+
+## Who this is for
+
+Use this guide to rebuild the report from the warehouse, audit how a finished page was made, or teach
+the workflow. It assumes basic Power BI Desktop familiarity but explains the non-obvious parts. If you
+only want to open the finished report, use the [README quickstart](../README.md) instead.
+
+## Build at a glance
+
+| Item | Detail |
+|---|---|
+| Outcome | Three-page `.pbix`, three screenshots, and a reconciled model |
+| Starting point | Platform warehouse running on `localhost:5434` |
+| Time | **2–3 hours** |
+| Difficulty | Intermediate — comfortable with Power BI Desktop |
+| Hard stop | **120** total orders · **99** non-cancelled · **$7,261.50** revenue |
+| Final proof | Every row in [§12](#12-reconcile) matches |
+
+## Build path
+
+```mermaid
+flowchart LR
+    A["Warehouse<br/>120 orders"] --> B["Connect<br/>§3"]
+    B --> C["Clean<br/>§4"]
+    C --> D["Model<br/>§5"]
+    D --> E["Measures<br/>§6"]
+    E --> F["Pages<br/>§8–10"]
+    F --> G["Reconcile<br/>§12"]
+    G --> H["Screenshots<br/>§13"]
+    H --> I["Publish<br/>§15"]
+```
+
+| Stage | Sections | Stop when… |
+|---|---|---|
+| Prepare the warehouse | [0](#0-deliverables)–[2](#2-start-and-verify-the-warehouse) | Source returns 120 / 99 / 7,261.50 |
+| Connect and clean | [3](#3-connect-power-bi)–[4](#4-clean-in-power-query) | Five typed tables, no `etl_watermark` |
+| Build the model | [5](#5-build-the-model) | Four single relationships, date table, `MonthStart` |
+| Add measures | [6](#6-add-the-measures) | All 16 measures match their expected values |
+| Build pages | [7](#7-apply-the-theme)–[10](#10-page-3--products--customers) | Three pages match the reference layouts |
+| Polish and prove | [11](#11-interactions-and-polish)–[13](#13-export-the-screenshots) | Reconciliation passes, screenshots exported |
+| Publish and wrap | [14](#14-documentation-and-evidence)–[19](#19-further-work) | Docs current, repository published |
 
 **Three rules that prevent most problems:**
 
@@ -29,7 +71,7 @@ visuals, fields, and checks; arrange them how they read best.
 | Power BI report, 3 pages | `powerbi/beanstream-kpi.pbix` |
 | Three page screenshots | `screenshots/01-executive.png`, `02-trends.png`, `03-products.png` |
 | Repo front page with screenshots + reconciliation | `README.md` |
-| One-page portfolio write-up | `case-study.md` |
+| Portfolio write-up | `case-study.md` |
 | Public GitHub repo | `github.com/malikb0/beanstream-powerbi` |
 
 **Result:** the report refreshes cleanly, reconciles to the platform's KPI summary, and ships three
@@ -56,6 +98,7 @@ themed pages with alt text, the `.pbix`, screenshots, README, and case study.
 Open a terminal in the **platform repo** (the folder with `docker-compose.yml`):
 
 ```bash
+make setup
 make up
 make seed
 make etl
@@ -621,13 +664,23 @@ zoom.
 
 ---
 
-## 14. Documentation
+## 14. Documentation and evidence
 
-The repo carries:
-- `README.md` — status, screenshots, pages, key findings, data/model, reconciliation, repo map.
-- `case-study.md` — context, problem, build, decisions, result, links.
+The repository ships a linked documentation set. Keep these pages current when the model or report
+changes; a stale number is worse than a missing one.
 
-If you rebuild this, use the same structure and keep every number traceable to the source KPI summary.
+| Document | Purpose |
+|---|---|
+| [`README.md`](../README.md) | Status, screenshots, pages, key findings, validation, repo map |
+| [`case-study.md`](../case-study.md) | Context, problem, build, decisions, result, links |
+| [`docs/README.md`](README.md) | Documentation hub and reading paths |
+| [`docs/architecture.md`](architecture.md) | Components, data flow, decisions, limits |
+| [`docs/data-model.md`](data-model.md) | Grain, keys, relationships, date table |
+| [`docs/measures.md`](measures.md) | All 16 measures, formats, expected values |
+| [`data/README.md`](../data/README.md) | Source tables, columns, rules, expected checks |
+| [`docs/publishing.md`](publishing.md) | Release runbook and repository settings |
+
+If you rebuild this, keep the same structure and trace every number back to the source KPI summary.
 
 ---
 
